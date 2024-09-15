@@ -20,7 +20,7 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
     }
 
     @Override

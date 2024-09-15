@@ -24,7 +24,7 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
-    private final LogoutHandler logoutHandler;
+//    private final LogoutHandler logoutHandler;
 
     private static final String[] ADMIN_URL = {
             "/api/v1/category/**",
@@ -56,8 +56,8 @@ public class SecurityConfiguration {
         http
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(req -> req.anyRequest().permitAll()
-//                        .requestMatchers("/api/v1/auth/**").permitAll()
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("/api/v1/auth/**").permitAll()
 //                        .requestMatchers("/swagger-ui/**").permitAll()
 //                        .requestMatchers("/v3/api-docs/**").permitAll()
 //                        .requestMatchers(POST, ADMIN_URL).hasRole(ADMIN.name())
@@ -69,12 +69,12 @@ public class SecurityConfiguration {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logout ->
-                        logout.logoutUrl("/api/v1/auth/logout")
-                                .addLogoutHandler(logoutHandler)
-                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
-                );
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//                .logout(logout ->
+//                        logout.logoutUrl("/api/v1/auth/logout")
+//                                .addLogoutHandler(logoutHandler)
+//                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+//                );
         return http.build();
     }
 }

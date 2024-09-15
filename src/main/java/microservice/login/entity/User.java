@@ -3,7 +3,7 @@ package microservice.login.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import javax.management.relation.Role;
+
 
 @Data
 @Builder
@@ -25,7 +25,7 @@ public class User {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column(nullable = false, length = 15)
+//    @Column(nullable = false, length = 15)
     private String password;
 
     @ManyToOne
