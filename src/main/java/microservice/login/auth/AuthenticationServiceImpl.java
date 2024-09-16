@@ -28,7 +28,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationServiceImpl implements AuthenticationService {
+public class  AuthenticationServiceImpl implements AuthenticationService {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
@@ -62,8 +62,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = findUserByEmail(request.email());
         UserDetails userDetails = new SecurityUser(user);
         String token = jwtService.generateToken(userDetails);
+
         revokeAllUserTokens(user);
+
         saveUserToken(user, token);
+
         return AuthenticationResponse.builder()
                 .token(token)
                 .build();

@@ -19,6 +19,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
+    @ResponseStatus(HttpStatus.OK)
     public AuthenticationResponse register(
             @RequestBody @Valid CreateUserRequest request
     ){
@@ -31,11 +32,6 @@ public class AuthenticationController {
             @RequestBody @Valid AuthenticationRequest request
     ) {
         return authenticationService.authenticate(request);
-    }
-    @GetMapping("/hello")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> refreshToken() throws IOException {
-        return ResponseEntity.ok("Hello from microservice");
     }
 
 }
