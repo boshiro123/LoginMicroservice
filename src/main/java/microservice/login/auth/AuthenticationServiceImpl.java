@@ -144,7 +144,9 @@ public class  AuthenticationServiceImpl implements AuthenticationService {
                 .firstname(request.firstname())
                 .lastname(request.lastname())
                 .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
+                .password(request.password())
+                .gender(request.gender())
+                .birthDate(request.birthDate())
                 .role(role)
                 .build();
         return new SecurityUser(user);

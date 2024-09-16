@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import microservice.login.token.Token;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -28,6 +29,12 @@ public class User {
 
     @Column(nullable = false, length = 100)
     private String password;
+
+    @Column(nullable = false, length = 10)
+    private String gender;
+
+    @Column(nullable = false)
+    private LocalDate birthDate;
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)

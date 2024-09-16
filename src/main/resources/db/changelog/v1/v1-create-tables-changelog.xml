@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- ChangeSet for creating the Users table -->
+    <changeSet id="1" author="boshiro123">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        <createTable tableName="users">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="firstname" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="lastname" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="email" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="gender" type="VARCHAR(10)">
+                <constraints nullable="false" />
+            </column>
+            <column name="birth_date" type="DATE">
+                <constraints nullable="false" />
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="boshiro123">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="roles"/>
+            </not>
+        </preConditions>
+        <createTable tableName="roles">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="boshiro123">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tokens"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tokens">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="token" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="revoked" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expired" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="tokens"
+                                 baseColumnNames="user_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_tokens_user_id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+</databaseChangeLog>

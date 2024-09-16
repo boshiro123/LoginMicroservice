@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Insert data into Users table -->
+    <changeSet id="1" author="boshiro123">
+        <insert tableName="users">
+            <column name="firstname" value="Bogdan"/>
+            <column name="lastname" value="Shiroki"/>
+            <column name="email" value="b.shiroki@mail.ru"/>
+            <column name="password" value="123"/>
+            <column name="gender" value="male"/>
+            <column name="birth_date" value="2003-07-15"/>
+            <column name="role_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="users">
+            <column name="firstname" value="Jon"/>
+            <column name="lastname" value="Smith"/>
+            <column name="email" value="jon.smith@example.com"/>
+            <column name="password" value="123"/>
+            <column name="gender" value="male"/>
+            <column name="birth_date" value="1999-01-02"/>
+            <column name="role_id" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="2" author="boshiro123">
+        <insert tableName="roles">
+            <column name="name" value="ADMIN"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="name" value="USER"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="3" author="boshiro123">
+    <insert tableName="tokens">
+        <column name="token" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"/>
+        <column name="revoked" value="true"/>
+        <column name="expired" value="true"/>
+        <column name="user_id" value="1"/>
+    </insert>
+
+    <insert tableName="tokens">
+        <column name="token" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG8yZSIsImlhdCI6MTUxNjIzOTAyMn0.NC6U-e9fExE5p8P-bktFhIZlLi_C3ySwLb_kpuGttjk"/>
+        <column name="revoked" value="true"/>
+        <column name="expired" value="true"/>
+        <column name="user_id" value="2"/>
+    </insert>
+    </changeSet>
+
+
+</databaseChangeLog>
