@@ -1,6 +1,7 @@
 package microservice.login.auth;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import microservice.login.dto.request.CreateUserRequest;
 import microservice.login.entity.Role;
 import microservice.login.entity.RoleName;
 import microservice.login.entity.User;
+import microservice.login.error.DuplicateResourceException;
 import microservice.login.error.ErrorMessages;
 import microservice.login.error.ResourceNotFoundException;
 import microservice.login.repositories.RoleRepository;
@@ -17,6 +19,7 @@ import microservice.login.service.AuthenticationService;
 import microservice.login.service.JwtService;
 import microservice.login.token.Token;
 import microservice.login.token.TokenRepository;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,43 +42,73 @@ public class  AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse register(CreateUserRequest request) {
+        checkUserExistence(request.email());
+
         Role defaultRole = findRoleByName(RoleName.USER);
         UserDetails userDetails = buildUser(request, defaultRole);
-        User savedUser = userRepository.save(((SecurityUser)userDetails).getUser());
-        String token = jwtService.generateToken(userDetails);
 
-        saveUserToken(savedUser, token);
+        User savedUser = userRepository.save(((SecurityUser) userDetails).getUser());
+        String accessToken = jwtService.generateToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        saveUserToken(savedUser, accessToken);
 
         return AuthenticationResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
-                )
+                new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
+
         User user = findUserByEmail(request.email());
         UserDetails userDetails = new SecurityUser(user);
-        String token = jwtService.generateToken(userDetails);
-
+        String accessToken = jwtService.generateToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
         revokeAllUserTokens(user);
-
-        saveUserToken(user, token);
-
+        saveUserToken(user, accessToken);
         return AuthenticationResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
     @Override
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String refreshToken;
+        final String userEmail;
+        final AuthenticationResponse authResponse;
 
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return;
+        }
+        refreshToken = authHeader.substring(7);
+        userEmail = jwtService.extractUserEmail(refreshToken);
+
+        if (userEmail != null) {
+            User user = findUserByEmail(userEmail);
+            UserDetails userDetails = new SecurityUser(user);
+
+            if (jwtService.isTokenValid(refreshToken, userDetails)) {
+                String newAccessToken = jwtService.generateToken(userDetails);
+                String newRefreshToken = jwtService.generateRefreshToken(userDetails);
+                revokeAllUserTokens(user);
+                saveUserToken(user, newAccessToken);
+
+                authResponse = AuthenticationResponse.builder()
+                        .accessToken(newAccessToken)
+                        .refreshToken(newRefreshToken)
+                        .build();
+
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+            }
+        }
     }
+
     private void saveUserToken(User user, String accessToken) {
         Token token = Token.builder()
                 .user(user)
@@ -115,6 +148,12 @@ public class  AuthenticationServiceImpl implements AuthenticationService {
                 .role(role)
                 .build();
         return new SecurityUser(user);
+    }
+
+    private void checkUserExistence(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new DuplicateResourceException(String.format(ErrorMessages.DUPLICATE_RESOURCE_MESSAGE, "User", "email"));
+        }
     }
 
 

@@ -1,6 +1,8 @@
 package microservice.login.auth;
 
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import microservice.login.dto.request.CreateUserRequest;
@@ -32,6 +34,15 @@ public class AuthenticationController {
             @RequestBody @Valid AuthenticationRequest request
     ) {
         return authenticationService.authenticate(request);
+    }
+
+    @PostMapping("/refresh-token")
+    @ResponseStatus(HttpStatus.OK)
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        authenticationService.refreshToken(request, response);
     }
 
 }

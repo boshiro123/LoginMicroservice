@@ -6,13 +6,11 @@ import lombok.Builder;
 @Builder
 public record AuthenticationResponse(
 
-        @JsonProperty("token")
-        String token
-//        @JsonProperty("access_token")
-//        String accessToken,
+        @JsonProperty("access_token")
+        String accessToken,
 
-//        @JsonProperty("refresh_token")
-//        String refreshToken
+        @JsonProperty("refresh_token")
+        String refreshToken
 
 ) {
 }
