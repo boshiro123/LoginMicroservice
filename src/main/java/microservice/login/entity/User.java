@@ -2,8 +2,9 @@ package microservice.login.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import microservice.login.token.Token;
 
-
+import java.util.List;
 
 @Data
 @Builder
@@ -25,11 +26,13 @@ public class User {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-//    @Column(nullable = false, length = 15)
+    @Column(nullable = false, length = 100)
     private String password;
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
 }
